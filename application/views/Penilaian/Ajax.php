@@ -259,6 +259,7 @@
             $('[name="tgl_penilaian"]').val(data.tgl_penilaian);
             $('[name="yang_menilai"]').val(data.yang_menilai);
             $('[name="email"]').val(data.email);
+            $('[name="nama_pelamar"]').val(data.nama_pelamar);
             $('#title').text('Kirim Email'); //change 
             $('#btnSave').text('Kirim Email'); //change
             $('#modal_penilaian_magang').modal('show'); // show bootstrap modal when complete loaded
@@ -354,8 +355,9 @@
                         <div id="error_menilai" class="invalid-feedback">harus diisi.</div>  
                       </div>
                       <div class="col-6" id="email"> 
-                        <label class="form-label fw-bold" for="yang_menilai">Email</label>
+                        <label class="form-label fw-bold" for="email">Email</label>
                         <input type="text" name="email">
+                        <input type="text" name="nama_pelamar">
                       </div>
                       <div class="col-12">
                         <button class="btn btn-primary" type="button" id="btnSave" onclick="save()">Simpan</button>

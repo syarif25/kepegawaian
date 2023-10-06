@@ -1,5 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class Penilaian_magang extends CI_Controller {
 	public function __construct()
@@ -7,6 +9,10 @@ class Penilaian_magang extends CI_Controller {
 		parent::__construct();
 		$this->load->model('Penilaian_model');   
 		$this->load->model('auth_model');
+
+        require APPPATH.'libraries/phpmailer/src/Exception.php';
+        require APPPATH.'libraries/phpmailer/src/PHPMailer.php';
+        require APPPATH.'libraries/phpmailer/src/SMTP.php';
 	}
 
     public function index()
@@ -102,48 +108,58 @@ class Penilaian_magang extends CI_Controller {
 		echo json_encode($data);
 	}
 
-	function kirim_email(){
-		// Konfigurasi email
-        $config = [
-            'mailtype'  => 'html',
-            'charset'   => 'utf-8',
-            'protocol'  => 'smtp',
-            'smtp_host' => 'smtp.gmail.com',
-            'smtp_user' => 'syarifaminul@gmail.com',  // Email gmail
-            'smtp_pass'   => 'syarif1995',  // Password gmail
-            'smtp_crypto' => 'ssl',
-            'smtp_port'   => 465,
-            'crlf'    => "\r\n",
-            'newline' => "\r\n"
-        ];
+	public function kirim_email(){
+        // PHPMailer object
+        $response = false;
+        $mail = new PHPMailer();
 
-        // Load library email dan konfigurasinya
-        $this->load->library('email', $config);
+        // SMTP configuration
+        $mail->isSMTP();
+        $mail->Host     = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'aminulkhoiri@gmail.com'; // user email anda
+        $mail->Password = 'nawnfatyappnolvk'; // diisi dengan App Password yang sudah di generate
+        $mail->SMTPSecure = 'ssl';
+        $mail->Port     = 465;
 
-        // Email dan nama pengirim
-        $this->email->from('syarifaminul@gmail.com', 'google.com');
+        $mail->setFrom('aminulkhoiri@gmail.com', 'FIK UNIB'); // user email anda
+        $mail->addReplyTo('aminulkhoiri@gmail.com', ''); //user email anda
 
-        // Email penerima
-        $this->email->to($this->input->post('email')); // Ganti dengan email tujuan
+        // Email subject
+        $mail->Subject = 'Penilaian Magang FIK UNIB'; //subject email
 
-        // Lampiran email, isi dengan url/path file
-        // $this->email->attach('https://images.pexels.com/photos/169573/pexels-photo-169573.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940');
+        // Add a recipient
+        $mail->addAddress($this->input->post('email')); //email tujuan pengiriman email
 
-        // Subject email
-        $this->email->subject('Hasil Magang di Fakultas Ilmu Kesehatan');
+        // Set email format to HTML
+        $mail->isHTML(true);
 
-        // Isi email
-        $this->email->message("Ini adalah contoh email yang dikirim kepada pelamar di fakultas kesehatan");
+        // Email body content
+        $mailContent = "<p>Assalamualaikum ini adalah contoh email.. </p>
+        <table>
+            <tr>
+            <td>Nama</td>
+            <td>:</td>
+            <td>".$this->input->post('nama_pelamar')."</td>
+            </tr>
+            <tr>
+            <td>Status Kelanjutan</td>
+            <td>:</td>
+            <td>".$this->input->post('status_lanjut')."</td>
+            </tr>
+           
+        </table>
+        <p>Jazakumullah Khairan</p>"; // isi email
+        $mail->Body = $mailContent;
 
-        // Tampilkan pesan sukses atau error
-        if ($this->email->send()) {
-            echo 'Sukses! email berhasil dikirim.';
-			echo json_encode(array("status" => TRUE));
-        } else {
-            echo 'Error! email tidak dapat dikirim.';
+        // Send email
+        if(!$mail->send()){
+            echo 'Message could not be sent.';
+            echo 'Mailer Error: ' . $mail->ErrorInfo;
+        }else{
+            echo 'Message has been sent';
         }
-		
-	}
+    }
 
 	public function cetak()
 	{   
