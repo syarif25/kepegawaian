@@ -151,14 +151,16 @@ class Penilaian_magang extends CI_Controller {
         </table>
         <p>Jazakumullah Khairan</p>"; // isi email
         $mail->Body = $mailContent;
-
+       
         // Send email
         if(!$mail->send()){
             echo 'Message could not be sent.';
             echo 'Mailer Error: ' . $mail->ErrorInfo;
         }else{
-            echo 'Message has been sent';
+            // echo 'Message has been sent';
+            echo json_encode(array("status" => TRUE));
         }
+       
     }
 
 	public function cetak()

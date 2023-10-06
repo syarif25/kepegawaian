@@ -145,7 +145,7 @@
         if(save_method == 'add') {
             url = "<?php echo site_url('Penilaian_magang/ajax_add')?>";
             var pesan = ' Menambah data';
-        }else if (save_method == 'email'){
+        }else if(save_method == 'email'){
           url = "<?php echo site_url('Penilaian_magang/kirim_email')?>";
             var pesan = ' Kirim Email';
         } else {
@@ -175,9 +175,7 @@
                         position: "right",
                         backgroundColor: "#33cc33",
                     }).showToast();
-                }
-                else
-                {
+                } else {
                     for (var i = 0; i < data.inputerror.length; i++) 
                     {
                         $('[name="'+data.inputerror[i]+'"]').parent().parent().addClass('has-error'); //select parent twice to select div form-group class and add has-error class
