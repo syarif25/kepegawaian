@@ -27,19 +27,114 @@
 
     <script>
     $(document).ready(function() {
-        var flashMessage = "<?php echo $this->session->flashdata('success'); ?>";
-    console.log("Flash Message: ", flashMessage);
-    
-        Toastify({
-            text: "<?php echo $this->session->flashdata('success'); ?>",
-            duration: 3000,
-            close: true,
-            gravity: "top", // Tampilan toast di bagian bawah
-            position: "right", // Tampilan toast di sisi kanan
-            backgroundColor: "#33cc33", // Warna latar belakang toast
-        }).showToast();
+        // Check for success or error flash messages
+        var successMessage = "<?php echo $this->session->flashdata('success'); ?>";
+        var errorMessage = "<?php echo $this->session->flashdata('error'); ?>";
+
+        if (successMessage) {
+            // Display a success toast notification
+            Toastify({
+                text: successMessage,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#33cc33",
+            }).showToast();
+        } else if (errorMessage) {
+            // Display an error toast notification
+            Toastify({
+                text: errorMessage,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#ff0000", // You can change the background color for errors
+            }).showToast();
+        }
     });
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('berkasform');
+        const inputs = form.querySelectorAll('input');
+        const simpanButton = document.getElementById('btnSave');
+
+        function checkInputsValidity() {
+        let allValid = true;
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+            allValid = false;
+            }
+        });
+        return allValid;
+        }
+
+        inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (!input.checkValidity()) {
+            input.classList.add('is-invalid');
+            } else {
+            input.classList.remove('is-invalid');
+            }
+
+            // Memeriksa validitas semua input setiap kali ada perubahan
+            // simpanButton.disabled = !checkInputsValidity();
+        });
+        });
+
+        // form.addEventListener('submit', function(event) {
+        //   if (!checkInputsValidity()) {
+        //     event.preventDefault();
+        //     inputs.forEach(input => {
+        //       if (!input.checkValidity()) {
+        //         input.classList.add('is-invalid');
+        //       }
+        //     });
+        //   }
+        // });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form_tulis = document.getElementById('form_tulis');
+        const inputs_tulis = form_tulis.querySelectorAll('input');
+        const simpanButton_tulis = document.getElementById('btnSaveTulis');
+
+        function checkInputsValidity() {
+        let allValid = true;
+        inputs_tulis.forEach(input => {
+            if (!input.checkValidity()) {
+            allValid = false;
+            }
+        });
+        return allValid;
+        }
+
+        inputs_tulis.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (!input.checkValidity()) {
+            input.classList.add('is-invalid');
+            } else {
+            input.classList.remove('is-invalid');
+            }
+
+            // Memeriksa validitas semua input setiap kali ada perubahan
+            simpanButton_tulis.disabled = !checkInputsValidity();
+        });
+        });
+
+        form_tulis.addEventListener('submit', function(event) {
+          if (!checkInputsValidity()) {
+            event.preventDefault();
+            inputs_tulis.forEach(input => {
+              if (!input.checkValidity()) {
+                input.classList.add('is-invalid');
+              }
+            });
+          }
+        });
+    });
+
+  
     var save_method; //for save method string
     var table;
 
@@ -111,7 +206,7 @@
         if(save_method == 'berkas') {
             url = "<?php echo site_url('seleksi/update_berkas')?>";
             var pesan = ' Edit data';
-            var formData = new FormData($('#form')[0]);
+            var formData = new FormData($('#berkasform')[0]);
         } else if(save_method == 'wawancara') {
             url = "<?php echo site_url('seleksi/update_wawancara')?>";
             var pesan = ' Edit data';
@@ -140,7 +235,14 @@
                     reload_table();
                     reload_table_tulis();
                     reload_table_wawancara();
-                    // notif(pesan);
+                    Toastify({
+                    text: "Berhasil " + pesan,
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#33cc33",
+                }).showToast();
                 }
                 else
                 {
@@ -166,7 +268,7 @@
     function edit_seleksi_berkas(id)
     {
         save_method = 'berkas';
-        $('#form')[0].reset(); // reset form on modals
+        $('#berkasform')[0].reset(); // reset form on modals
 
 
         //Ajax Load data from ajax
@@ -193,7 +295,7 @@
     function edit_seleksi_tulis(id)
     {
         save_method = 'tulis';
-        $('#form')[0].reset(); // reset form on modals
+        $('#form_tulis')[0].reset(); // reset form on modals
 
         //Ajax Load data from ajax
         $.ajax({
@@ -206,7 +308,7 @@
             $('[name="nama_pelamar"]').val(data.nama_pelamar);
             $('[name="rencana_jabatan"]').val(data.rencana_jabatan);
             $('[name="nilai_test_tulis"]').val(data.nilai_test_tulis);
-            $('[name="tanggal_lamaran"]').val(data.tanggal_lamaran);
+            $('[name="tanggal_test_tulis"]').val(data.tanggal_lamaran);
             $('#modal_seleksi_tulis').modal('show'); // show bootstrap modal when complete loaded
             },
             error: function (jqXHR, textStatus, errorThrown)
@@ -219,7 +321,7 @@
     function edit_wawancara(id)
     {
         save_method = 'wawancara';
-        $('#form')[0].reset(); // reset form on modals
+        $('#form_wawancara')[0].reset(); // reset form on modals
 
         //Ajax Load data from ajax
         $.ajax({
@@ -267,27 +369,32 @@
                         <h4>Seleksi Berkas</h4>
                     </div>
                   <div class="card-body custom-input">
-                    <form action="#" id="form" class="row g-3">
+                    <form action="#" id="berkasform" class="row g-3">
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="nama_pelamar">Nama Lengkap</label>
                         <input type="hidden" name="id_pelamar">
                         <input class="form-control" readonly id="nama_pelamar" name="nama_pelamar" type="text" placeholder="Nama Lengkap" required="">
-                      </div>
+                        <div id="error_nama" class="invalid-feedback">Nama Lengkap harus diisi.</div>    
+                    </div>
                      <div class="col-6"> 
                         <label class="form-label fw-bold" for="rencana_jabatan">Rencana Jabatan</label>
                         <input class="form-control" readonly id="rencana_jabatan" name="rencana_jabatan" type="text" placeholder="Rencana Jabatan" required="">
-                      </div>
+                        <div id="error_jabatan" class="invalid-feedback">Nama Lengkap harus diisi.</div>    
+                    </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="nilai">Nilai</label>
                         <input class="form-control" id="nilai" name="nilai" type="number" placeholder="" required=""> 
+                        <div id="error_nilai_berkas" class="invalid-feedback">Nilai harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="file_berkas">File Berkas</label>
                         <input class="form-control" id="file_berkas" name="file_berkas" type="file"  required=""> 
+                        <!-- <div id="error_file_berkas" class="invalid-feedback">File Berkas harus diisi.</div>   -->
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="tanggal_test_berkas">Tanggal Test</label>
-                        <input class="form-control" id="tanggal_test_berkas" name="tanggal_test_berkas" type="date"  required=""> 
+                        <input class="form-control" id="tanggal_test_berkas" name="tanggal_test_berkas" type="date"  required="">
+                        <div id="error_tanggal" class="invalid-feedback">Tanggal harus diisi.</div>   
                       </div>
                       <div class="col-12">
                         <button class="btn btn-primary" type="button" id="btnSave" onclick="save()">Simpan</button>
@@ -320,14 +427,16 @@
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="nilai_test_tulis">Nilai</label>
-                        <input class="form-control" id="nilai_test_tulis" name="nilai_test_tulis" type="number" placeholder="" required=""> 
-                      </div>
+                        <input class="form-control" id="nilai_test_tulis" name="nilai_test_tulis" type="number" required=""> 
+                        <div id="error_nilai" class="invalid-feedback">Nilai harus diisi.</div>    
+                    </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="tanggal_test_tulis">Tanggal</label>
                         <input class="form-control" id="tanggal_test_tulis" name="tanggal_test_tulis" type="date"  required=""> 
-                      </div>
+                        <div id="error_tanggal_tulis" class="invalid-feedback">Tanggal harus diisi.</div>    
+                    </div>
                       <div class="col-12">
-                        <button class="btn btn-primary" type="button" id="btnSave" onclick="save()">Simpan</button>
+                        <button class="btn btn-primary" type="button" id="btnSaveTulis" onclick="save()">Simpan</button>
                       </div>
                     </form>
                   </div>
@@ -342,7 +451,7 @@
         <div class="modal-content">
             <div class="card height-equal">
                     <div class="card-header">
-                        <h4>Seleksi Tulis</h4>
+                        <h4>Seleksi Wawancara</h4>
                     </div>
                   <div class="card-body custom-input">
                     <form action="#" id="form_wawancara" class="row g-3">
@@ -350,18 +459,22 @@
                         <label class="form-label fw-bold" for="nama_pelamar">Nama Lengkap</label>
                         <input type="hidden" name="id_pelamar">
                         <input class="form-control" readonly id="nama_pelamar" name="nama_pelamar" type="text" placeholder="Nama Lengkap" required="">
-                      </div>
+                        <div id="error_nama_pelamar" class="invalid-feedback">Nama Lengkap harus diisi.</div>    
+                    </div>
                      <div class="col-6"> 
                         <label class="form-label fw-bold" for="rencana_jabatan">Rencana Jabatan</label>
                         <input class="form-control" readonly id="rencana_jabatan" name="rencana_jabatan" type="text" placeholder="Rencana Jabatan" required="">
-                      </div>
+                        <div id="error_rencana_jabatan" class="invalid-feedback">Nama Lengkap harus diisi.</div>    
+                    </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="nilai_wawancara">Nilai</label>
                         <input class="form-control" id="nilai_wawancara" name="nilai_wawancara" type="number" placeholder="" required=""> 
-                      </div>
+                        <div id="error_nilai" class="invalid-feedback">Nilai harus diisi.</div>    
+                    </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="tanggal_wawancara">Tanggal</label>
                         <input class="form-control" id="tanggal_wawancara" name="tanggal_wawancara" type="date"  required=""> 
+                        <div id="error_nilai" class="invalid-feedback">Tanggal harus diisi.</div>   
                       </div>
                       <div class="col-12">
                         <button class="btn btn-primary" type="button" id="btnSave" onclick="save()">Simpan</button>

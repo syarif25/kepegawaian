@@ -4,12 +4,10 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Cuba admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities.">
-    <meta name="keywords" content="admin template, Cuba admin template, dashboard template, flat admin template, responsive admin template, web app">
-    <meta name="author" content="pixelstrap">
-    <link rel="icon" href="<?php echo base_url() ?>assets/images/favicon.png" type="image/x-icon">
-    <link rel="shortcut icon" href="<?php echo base_url() ?>assets/images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="<?php echo base_url() ?>assets/1.png" type="image/x-icon">
+    <link rel="shortcut icon" href="<?php echo base_url() ?>assets/1.png" type="image/x-icon">
+   
+
     <title>SIMPEG - Sistem Informasi Kepegawaian FIK UNIB</title>
     <?php $this->load->view($css); ?>
   </head>
@@ -76,7 +74,7 @@
                 </div>
               </li>
               
-              <li class="onhover-dropdown">
+              <!-- <li class="onhover-dropdown">
                 <div class="notification-box">
                   <svg>
                     <use href="<?php echo base_url() ?>assets/svg/icon-sprite.svg#notification"></use>
@@ -100,11 +98,11 @@
                     <li><a class="f-w-700" href="#">Check all</a></li>
                   </ul>
                 </div>
-              </li>
+              </li> -->
               <li class="profile-nav onhover-dropdown pe-0 py-0">
                 <div class="media profile-media"><img class="b-r-10" src="<?php echo base_url() ?>assets/images/dashboard/profile.png" alt="">
-                  <div class="media-body"><span>Emay Walter</span>
-                    <p class="mb-0 font-roboto">Admin <i class="middle fa fa-angle-down"></i></p>
+                  <div class="media-body"><span><?php echo $this->session->userdata('username'); ?></span>
+                    <p class="mb-0 font-roboto"> <i class="middle fa fa-angle-down"></i></p>
                   </div>
                 </div>
                 <ul class="profile-dropdown onhover-show-div">
@@ -130,7 +128,7 @@
         <!-- Page Sidebar Start-->
         <div class="sidebar-wrapper" sidebar-layout="stroke-svg">
           <div>
-            <div class="logo-wrapper"><a href="index.html"><img class="img-fluid for-light" src="<?php echo base_url() ?>assets/images/logo/logo.png" alt=""><img class="img-fluid for-dark" src="<?php echo base_url() ?>assets/images/logo/logo_dark.png" alt=""></a>
+            <div class="logo-wrapper"><a href="index.html"><img class="img-fluid for-light" src="<?php echo base_url() ?>assets/images/logo/logo1.jpg" alt=""><img class="img-fluid for-dark" src="<?php echo base_url() ?>assets/images/logo/logo_dark.png" alt=""></a>
               <div class="back-btn"><i class="fa fa-angle-left"></i></div>
               <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="grid"> </i></div>
             </div>
@@ -160,6 +158,14 @@
                       <svg class="fill-icon">
                         <use href="<?php echo base_url() ?>assets/svg/icon-sprite.svg#fill-home"></use>
                       </svg><span class="lan-3">Dashboard          </span></a>
+                    </li>
+                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title link-nav" href="<?php echo base_url() ?>Pengguna">
+                      <svg class="stroke-icon">
+                        <use href="<?php echo base_url() ?>assets/svg/icon-sprite.svg#stroke-user"></use>
+                      </svg>
+                      <svg class="fill-icon">
+                        <use href="<?php echo base_url() ?>assets/svg/icon-sprite.svg#fill-user"> </use>
+                      </svg><span>Pengguna</span></a>
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title link-nav" href="<?php echo base_url() ?>Lembaga">
                       <svg class="stroke-icon">
@@ -225,13 +231,21 @@
                         <use href="<?php echo base_url() ?>assets/svg/icon-sprite.svg#fill-file"> </use>
                       </svg><span>Kontrak Kerja</span></a>
                     </li>
-                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title link-nav" href="<?php echo base_url() ?>Perizinan">
+                    <!-- <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title link-nav" href="<?php echo base_url() ?>Perizinan">
                       <svg class="stroke-icon">
                         <use href="<?php echo base_url() ?>assets/svg/icon-sprite.svg#stroke-file"></use>
                       </svg>
                       <svg class="fill-icon">
                         <use href="<?php echo base_url() ?>assets/svg/icon-sprite.svg#fill-file"> </use>
                       </svg><span>Perizinan</span></a>
+                    </li> -->
+                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title link-nav" href="<?php echo base_url() ?>Auth/logout">
+                      <svg class="stroke-icon">
+                        <use href="<?php echo base_url() ?>assets/svg/icon-sprite.svg#stroke-file"></use>
+                      </svg>
+                      <svg class="fill-icon">
+                        <use href="<?php echo base_url() ?>assets/svg/icon-sprite.svg#fill-file"> </use>
+                      </svg><span>Log Out</span></a>
                     </li>
                     <!-- <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title" href="#">
                       <svg class="stroke-icon">
@@ -274,5 +288,33 @@
       </div>
     </div>
     <?php $this->load->view($ajax); ?>
+    <script>
+      function notif(pesan) {
+        toastr.success(pesan, "Berhasil", {
+        positionClass: "toast-top-right",
+        timeOut: 5000,
+        closeButton: true,
+        debug: false,
+        newestOnTop: true,
+        progressBar: true,
+        preventDuplicates: true,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "1000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut",
+        tapToDismiss: false,
+        // Menggunakan properti css untuk mengubah warna teks menjadi kuning
+        css: {
+            color: "yellow"
+        }
+    });
+
+
+    }
+    </script>
   </body>
 </html>

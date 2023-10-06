@@ -6,10 +6,12 @@ class Penilaian_magang extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->model('Penilaian_model');   
+		$this->load->model('auth_model');
 	}
 
     public function index()
 	{
+		$this->auth_model->getsqurity() ;
 		$isi['content'] = 'Penilaian/Penilaian_magang';
 		$isi['ajax'] 	= 'Penilaian/Ajax';
         $isi['css'] 	= 'Penilaian/Css';
@@ -43,8 +45,9 @@ class Penilaian_magang extends CI_Controller {
 			$row[] = $this->date_lengkap($datanya->tgl_penilaian);
 			$row[] = htmlentities($datanya->yang_menilai);
 			//add html for action
-			$row[] = '<a type="button" class="icon-pencil-alt" href="#" 
-			title="Track" onclick="edit_penilaian_magang('."'".$datanya->id_penilaian."'".')"></a>';
+			$row[] = '<a type="button" class="btn btn-sm btn-info fas fa-pencil-alt" href="#" 
+			title="Track" onclick="edit_penilaian_magang('."'".$datanya->id_penilaian."'".')"> Edit</a>
+			<a type="button" class="btn btn-sm btn-danger fas fa-paper-plane" onclick="kirim_email('."'".$datanya->id_penilaian."'".')"> Email</a> ';
 		    $data[] = $row;
 		}
 		$output = array("data" => $data);
@@ -90,12 +93,63 @@ class Penilaian_magang extends CI_Controller {
         
 		$this->Penilaian_model->update(array('id_penilaian' => $this->input->post('id_penilaian')), $data);
 		echo json_encode(array("status" => TRUE));
-		$this->session->set_flashdata('message', 'Data berhasil diubah');
+		// $this->session->set_flashdata('message', 'Data berhasil diubah');
 	}
 
 	public function ajax_edit($id)
 	{
 		$data = $this->Penilaian_model->get_by_id($id);
 		echo json_encode($data);
+	}
+
+	function kirim_email(){
+		// Konfigurasi email
+        $config = [
+            'mailtype'  => 'html',
+            'charset'   => 'utf-8',
+            'protocol'  => 'smtp',
+            'smtp_host' => 'smtp.gmail.com',
+            'smtp_user' => 'syarifaminul@gmail.com',  // Email gmail
+            'smtp_pass'   => 'syarif1995',  // Password gmail
+            'smtp_crypto' => 'ssl',
+            'smtp_port'   => 465,
+            'crlf'    => "\r\n",
+            'newline' => "\r\n"
+        ];
+
+        // Load library email dan konfigurasinya
+        $this->load->library('email', $config);
+
+        // Email dan nama pengirim
+        $this->email->from('syarifaminul@gmail.com', 'google.com');
+
+        // Email penerima
+        $this->email->to($this->input->post('email')); // Ganti dengan email tujuan
+
+        // Lampiran email, isi dengan url/path file
+        // $this->email->attach('https://images.pexels.com/photos/169573/pexels-photo-169573.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940');
+
+        // Subject email
+        $this->email->subject('Hasil Magang di Fakultas Ilmu Kesehatan');
+
+        // Isi email
+        $this->email->message("Ini adalah contoh email yang dikirim kepada pelamar di fakultas kesehatan");
+
+        // Tampilkan pesan sukses atau error
+        if ($this->email->send()) {
+            echo 'Sukses! email berhasil dikirim.';
+			echo json_encode(array("status" => TRUE));
+        } else {
+            echo 'Error! email tidak dapat dikirim.';
+        }
+		
+	}
+
+	public function cetak()
+	{   
+		$this->load->library('Pdf'); 
+		$isi['data'] = $this->db->query("SELECT * FROM penilaian_magang, magang, pelamar where magang.id_magang = penilaian_magang.id_magang and
+		magang.nik = pelamar.nik ")->result();
+		$this->load->view('Penilaian/cetak',$isi);
 	}
 }

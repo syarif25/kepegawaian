@@ -5,11 +5,13 @@ class Pelamar extends CI_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('Pelamar_model');   
+		$this->load->model('Pelamar_model'); 
+        $this->load->model('auth_model');
 	}
 
 	public function index()
 	{
+        $this->auth_model->getsqurity() ;
 		$isi['content'] = 'Pelamar/Pelamar';
 		$isi['ajax'] 	= 'Pelamar/Ajax';
         $isi['css'] 	= 'Pelamar/Css';
@@ -75,7 +77,7 @@ class Pelamar extends CI_Controller {
             <div class="btn-group btn-group-pill" role="group" aria-label="Basic example">
                           <button class="btn btn-info" type="button" onclick="edit_pelamar('."'".$datanya->id_pelamar."'".')">Edit</button>
                           <button class="btn btn-primary" type="button">Detail</button>
-                          <button class="btn btn-info" type="button">Delete</button>
+                          <a type="button" class="btn btn-info" href="Pelamar/hapus_lembaga/'.$datanya->id_pelamar.'" onclick="return confirm(\'Apakah Anda yakin ingin menghapus item ini?\')"> Hapus</a>
                         </div>';
 		    $data[] = $row;
 		}
@@ -134,6 +136,21 @@ class Pelamar extends CI_Controller {
 		$data = $this->Pelamar_model->get_by_id($id);
 		echo json_encode($data);
 	}
+
+    public function hapus_lembaga($item_id) {
+        $result = $this->Pelamar_model->delete($item_id);
+
+        if ($result) {
+            // Jika penghapusan berhasil, tampilkan notifikasi toast berhasil
+            $this->session->set_flashdata('success', 'Item berhasil dihapus.');
+        } else {
+            // Jika penghapusan gagal, tampilkan notifikasi toast gagal
+            $this->session->set_flashdata('error', 'Gagal menghapus item.');
+        }
+
+        // Alihkan kembali ke halaman sebelumnya atau halaman yang sesuai
+        redirect('pelamar');
+    }
 
     
 }

@@ -66,4 +66,13 @@ class Lembaga_model extends CI_Model {
 
 		return $query->row();
 	}
+
+	public function delete($item_id) {
+        // Lakukan proses penghapusan data sesuai kebutuhan
+        // Contoh penghapusan data dari tabel 'items'
+        $this->db->where('id_lembaga', $item_id);
+        $this->db->delete('tb_lembaga');
+
+        return $this->db->affected_rows() > 0;
+    }
 }

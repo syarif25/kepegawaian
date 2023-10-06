@@ -64,7 +64,11 @@ class Penilaian_model extends CI_Model {
 
 	public function get_by_id($id)
 	{
-		$this->db->from($this->table);
+		$this->db->select('*');
+        $this->db->from($this->table);
+        $this->db->join('magang', 'magang.id_magang = penilaian_magang.id_magang', 'left');
+        $this->db->join('pelamar', 'magang.nik = pelamar.nik', 'left');
+
 		$this->db->where('id_penilaian',$id);
 		$query = $this->db->get();
 

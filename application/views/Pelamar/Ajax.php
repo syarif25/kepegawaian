@@ -1,5 +1,6 @@
     <!-- latest jquery-->
     <script src="<?php echo base_url() ?>assets/js/jquery.min.js"></script>
+
     <!-- Bootstrap js-->
     <script src="<?php echo base_url() ?>assets/js/bootstrap/bootstrap.bundle.min.js"></script>
     <!-- feather icon js-->
@@ -26,19 +27,79 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script>
-    $(document).ready(function() {
-        var flashMessage = "<?php echo $this->session->flashdata('success'); ?>";
-    console.log("Flash Message: ", flashMessage);
-    
-        Toastify({
-            text: "<?php echo $this->session->flashdata('success'); ?>",
-            duration: 3000,
-            close: true,
-            gravity: "top", // Tampilan toast di bagian bawah
-            position: "right", // Tampilan toast di sisi kanan
-            backgroundColor: "#33cc33", // Warna latar belakang toast
-        }).showToast();
+      $(document).ready(function() {
+        // Check for success or error flash messages
+        var successMessage = "<?php echo $this->session->flashdata('success'); ?>";
+        var errorMessage = "<?php echo $this->session->flashdata('error'); ?>";
+
+        if (successMessage) {
+            // Display a success toast notification
+            Toastify({
+                text: successMessage,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#33cc33",
+            }).showToast();
+        } else if (errorMessage) {
+            // Display an error toast notification
+            Toastify({
+                text: errorMessage,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#ff0000", // You can change the background color for errors
+            }).showToast();
+        }
     });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('pelamarForm');
+    const inputs = form.querySelectorAll('input');
+    const simpanButton = document.getElementById('btnSave');
+
+    function checkInputsValidity() {
+      let allValid = true;
+      inputs.forEach(input => {
+        if (!input.checkValidity()) {
+          allValid = false;
+        }
+      });
+      return allValid;
+    }
+
+    inputs.forEach(input => {
+      input.addEventListener('blur', function() {
+        if (!input.checkValidity()) {
+          input.classList.add('is-invalid');
+        } else {
+          input.classList.remove('is-invalid');
+        }
+
+        // Memeriksa validitas semua input setiap kali ada perubahan
+        simpanButton.disabled = !checkInputsValidity();
+      });
+    });
+
+    form.addEventListener('submit', function(event) {
+      if (!checkInputsValidity()) {
+        event.preventDefault();
+        inputs.forEach(input => {
+          if (!input.checkValidity()) {
+            input.classList.add('is-invalid');
+          }
+        });
+      }
+    });
+
+     // Disable "Simpan" button when modal is shown with empty inputs
+     $('#modal_pelamar').on('show.bs.modal', function () {
+            simpanButton.disabled = !checkInputsValidity();
+        });
+  });
+
 
     var save_method; //for save method string
     var table;
@@ -66,7 +127,7 @@
     });
 
     function tambah_pelamar() {
-         $('#form')[0].reset(); // reset form on modals
+         $('#pelamarForm')[0].reset(); // reset form on modals
          save_method = 'add';
         $('#modal_pelamar').modal('show');    
     }
@@ -84,7 +145,7 @@
             var pesan = ' Edit data';
         }
 
-        var formData = new FormData($('#form')[0]);
+        var formData = new FormData($('#pelamarForm')[0]);
         $.ajax({
             url : url,
             type: "POST",
@@ -99,6 +160,14 @@
                     $('#modal_pelamar').modal('hide');
                     reload_table();
                     // notif(pesan);
+                    Toastify({
+                    text: "Berhasil " + pesan,
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#33cc33",
+                }).showToast();
                 }
                 else
                 {
@@ -124,7 +193,7 @@
     function edit_pelamar(id)
     {
         save_method = 'update';
-        $('#form')[0].reset(); // reset form on modals
+        $('#pelamarForm')[0].reset(); // reset form on modals
 
 
         //Ajax Load data from ajax
@@ -168,43 +237,52 @@
                         <h4>Data Pelamar</h4>
                     </div>
                   <div class="card-body custom-input">
-                    <form action="#" id="form" class="row g-3">
+                    <form action="#" id="pelamarForm" class="row g-3">
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="nama_pelamar">Nama Lengkap</label>
                         <input type="hidden" name="id_pelamar">
                         <input class="form-control" id="nama_pelamar" name="nama_pelamar" type="text" placeholder="Nama Lengkap" required="">
+                        <div id="error_nama_pelamar" class="invalid-feedback">Nama Lengkap harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="nik">NIK</label>
                         <input class="form-control" id="nik" name="nik" type="text" placeholder="NIK" required="">
+                        <div id="error_nik" class="invalid-feedback">NIK harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="tempat_lahir">Tempat Lahir</label>
                         <input class="form-control" id="tempat_lahir" name="tempat_lahir" type="text" placeholder="Tempat Lahir" required="">
+                        <div id="error_tempat_lahir" class="invalid-feedback">Tempat Lahir harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="tanggal_lahir">Tanggal Lahir</label>
                         <input class="form-control" id="tanggal_lahir" name="tanggal_lahir" type="date" required="">
+                        <div id="error_tanggal_lahir" class="invalid-feedback">Tanggal Lahir harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="rencana_jabatan">Rencana Jabatan</label>
                         <input class="form-control" id="rencana_jabatan" name="rencana_jabatan" type="text" placeholder="Rencana Jabatan" required="">
+                        <div id="error_rencana" class="invalid-feedback">Rencana Jabatan harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="alamat">Alamat</label>
                         <input class="form-control" id="alamat" name="alamat" type="text" placeholder="Alamat" required=""> 
+                        <div id="error_alamat" class="invalid-feedback">Alamat harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="no_hp">Nomor HP</label>
                         <input class="form-control" id="no_hp" name="no_hp" type="text" placeholder="No HP" required=""> 
+                        <div id="error_nomor_hp" class="invalid-feedback">Nomer HP harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="email">Email</label>
                         <input class="form-control" id="email" name="email" type="email" placeholder="email" required=""> 
+                        <div id="error_email" class="invalid-feedback">Email harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="tanggal_lamaran">Tanggal Lamaran</label>
                         <input class="form-control" id="tanggal_lamaran" name="tanggal_lamaran" type="date" required=""> 
+                        <div id="error_tanggal_lamaran" class="invalid-feedback">Nama Lembaga harus diisi.</div>  
                       </div>
                       <div class="col-12">
                         <button class="btn btn-primary" type="button" id="btnSave" onclick="save()">Simpan</button>

@@ -6,10 +6,13 @@ class Lembaga extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->model('lembaga_model');   
+		$this->load->library('form_validation');
+		$this->load->model('auth_model');
 	}
 
 	public function index()
 	{
+		$this->auth_model->getsqurity() ;
 		$isi['content'] = 'Lembaga/Lembaga';
 		$isi['ajax'] 	= 'Lembaga/Ajax';
         $isi['css'] 	= 'Lembaga/Css';
@@ -34,7 +37,8 @@ class Lembaga extends CI_Controller {
 			$row[] = htmlentities($datanya->ktu);
 			//add html for action
 			$row[] = '<a type="button" class="icon-pencil-alt" href="#" 
-			title="Track" onclick="edit_lembaga('."'".$datanya->id_lembaga."'".')"></a>';
+			title="Track" onclick="edit_lembaga('."'".$datanya->id_lembaga."'".')"></a>
+			<a type="button" class="icon-trash text-danger" href="Lembaga/hapus_lembaga/'.$datanya->id_lembaga.'" onclick="return confirm(\'Apakah Anda yakin ingin menghapus item ini?\')"></a>';
 		    $data[] = $row;
 		}
 		$output = array("data" => $data);
@@ -43,9 +47,11 @@ class Lembaga extends CI_Controller {
 
 	public function ajax_add()
 	{
-		// $this->_validate();
 		// Mendapatkan ID terakhir dari tabel atau file terpisah
         $last_id = $this->lembaga_model->get_last_id(); // Ganti dengan metode yang sesuai
+
+		$this->form_validation->set_rules('nama', 'Nama', 'required|min_length[3]');
+    	$this->form_validation->set_rules('email', 'Email', 'required|valid_email');
 
         // Menghasilkan kode baru
         $next_id = $last_id + 1;
@@ -65,24 +71,39 @@ class Lembaga extends CI_Controller {
 	}
 
 	public function ajax_update(){
-        // $this->_validate();
-       $data = array(
-		'nama_lembaga' 	=> $this->input->post('nama_lembaga'),
-		'dekan' 		=> $this->input->post('dekan'),
-		'wadek1' 		=> $this->input->post('wadek1'),
-		'wadek2' 		=> $this->input->post('wadek2'),
-		'wadek3' 		=> $this->input->post('wadek3'),
-		'ktu' 			=> $this->input->post('ktu'),
-        );
-        
+		$data = array(
+			'nama_lembaga' => $this->input->post('nama_lembaga'),
+			'dekan' => $this->input->post('dekan'),
+			'wadek1' => $this->input->post('wadek1'),
+			'wadek2' => $this->input->post('wadek2'),
+			'wadek3' => $this->input->post('wadek3'),
+			'ktu' => $this->input->post('ktu'),
+		);
+	
 		$this->lembaga_model->update(array('id_lembaga' => $this->input->post('id_lembaga')), $data);
+		$this->session->set_flashdata('success', 'Item berhasil dirubah.'); // Menyimpan pesan dalam session
 		echo json_encode(array("status" => TRUE));
-		$this->session->set_flashdata('message', 'Data berhasil diubah');
 	}
+	
 
 	public function ajax_edit($id)
 	{
 		$data = $this->lembaga_model->get_by_id($id);
 		echo json_encode($data);
 	}
+
+	public function hapus_lembaga($item_id) {
+        $result = $this->lembaga_model->delete($item_id);
+
+        if ($result) {
+            // Jika penghapusan berhasil, tampilkan notifikasi toast berhasil
+            $this->session->set_flashdata('success', 'Item berhasil dihapus.');
+        } else {
+            // Jika penghapusan gagal, tampilkan notifikasi toast gagal
+            $this->session->set_flashdata('error', 'Gagal menghapus item.');
+        }
+
+        // Alihkan kembali ke halaman sebelumnya atau halaman yang sesuai
+        redirect('lembaga');
+    }
 }

@@ -25,3 +25,5 @@
     <!-- Responsive css-->
     <link rel="stylesheet" type="text/css" href="<?php echo base_url() ?>assets/css/responsive.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-toast-plugin@1.3.2/dist/jquery.toast.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+

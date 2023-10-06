@@ -67,7 +67,12 @@ class Magang_model extends CI_Model {
 		$this->db->from($this->table);
 		$this->db->where('id_magang',$id);
 		$query = $this->db->get();
-
 		return $query->row();
 	}
+
+	public function delete($item_id) {
+        $this->db->where('id_magang', $item_id);
+        $this->db->delete('magang');
+        return $this->db->affected_rows() > 0;
+    }
 }

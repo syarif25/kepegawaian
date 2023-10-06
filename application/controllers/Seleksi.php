@@ -7,10 +7,12 @@ class Seleksi extends CI_Controller {
 		parent::__construct();
 		$this->load->model('Seleksi_model');   
         $this->load->helper('string');
+		$this->load->model('auth_model');
 	}
 
 	public function berkas()
 	{
+		$this->auth_model->getsqurity() ;
 		$isi['content'] = 'Seleksi/Seleksi';
 		$isi['ajax'] 	= 'Seleksi/Ajax';
         $isi['css'] 	= 'Seleksi/Css';
@@ -131,24 +133,24 @@ class Seleksi extends CI_Controller {
 	}
 
 	public function update_berkas(){
-        // $this->_validate();
-        $data = array(
-            'penilaian_berkas' 	  => $this->input->post('nilai'),
-            'tanggal_test_berkas' => $this->input->post('tanggal_test_berkas'),
-            'file_berkas' 	      => '',
-            );
-            if(!empty($_FILES['file_berkas']['name']))
-            {
-                $upload = $this->_do_upload();
-                $data['file_berkas'] = $upload;
-            }
-       
-
+		// $this->_validate();
+	
+		$data = array(
+			'penilaian_berkas' 	  => $this->input->post('nilai'),
+			'tanggal_test_berkas' => $this->input->post('tanggal_test_berkas'),
+		);
+	
+		if (!empty($_FILES['file_berkas']['name'])) {
+			// Jika file berkas diunggah, lakukan proses unggah
+			$upload = $this->_do_upload();
+			$data['file_berkas'] = $upload;
+		}
+	
 		$this->Seleksi_model->update(array('id_pelamar' => $this->input->post('id_pelamar')), $data);
-        $this->session->set_flashdata('success', 'Data berhasil diubah.');
+		$this->session->set_flashdata('success', 'Data berhasil diubah.');
 		echo json_encode(array("status" => TRUE));
-        
 	}
+	
 
     public function update_tulis(){
         // $this->_validate();

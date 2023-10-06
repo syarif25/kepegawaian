@@ -6,10 +6,12 @@ class Magang extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->model('magang_model');   
+		$this->load->model('auth_model');
 	}
 
 	public function index()
 	{
+		$this->auth_model->getsqurity() ;
 		$isi['content'] = 'Magang/Magang';
 		$isi['ajax'] 	= 'Magang/Ajax';
         $isi['css'] 	= 'Magang/Css';
@@ -39,7 +41,8 @@ class Magang extends CI_Controller {
 			$row[] = htmlentities($datanya->yang_mengesahkan);
 			//add html for action
 			$row[] = '<a type="button" class="icon-pencil-alt" href="#" 
-			title="Track" onclick="edit_magang('."'".$datanya->id_magang."'".')"></a>';
+			title="Track" onclick="edit_magang('."'".$datanya->id_magang."'".')"></a>
+			<a type="button" class="icon-trash text-danger" href="Magang/hapus/'.$datanya->id_magang.'" onclick="return confirm(\'Apakah Anda yakin ingin menghapus item ini?\')"></a>';
 		    $data[] = $row;
 		}
 		$output = array("data" => $data);
@@ -76,8 +79,8 @@ class Magang extends CI_Controller {
         );
         
 		$this->magang_model->update(array('id_magang' => $this->input->post('id_magang')), $data);
+		$this->session->set_flashdata('success', 'Data berhasil diubah.');
 		echo json_encode(array("status" => TRUE));
-		$this->session->set_flashdata('message', 'Data berhasil diubah');
 	}
 
 	public function ajax_edit($id)
@@ -85,4 +88,19 @@ class Magang extends CI_Controller {
 		$data = $this->magang_model->get_by_id($id);
 		echo json_encode($data);
 	}
+
+	public function hapus($item_id) {
+        $result = $this->magang_model->delete($item_id);
+
+        if ($result) {
+            // Jika penghapusan berhasil, tampilkan notifikasi toast berhasil
+            $this->session->set_flashdata('success', 'Item berhasil dihapus.');
+        } else {
+            // Jika penghapusan gagal, tampilkan notifikasi toast gagal
+            $this->session->set_flashdata('error', 'Gagal menghapus item.');
+        }
+
+        // Alihkan kembali ke halaman sebelumnya atau halaman yang sesuai
+        redirect('magang');
+    }
 }

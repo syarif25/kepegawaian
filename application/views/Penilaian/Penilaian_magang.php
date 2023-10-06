@@ -29,7 +29,7 @@
                 <div class="card-header pb-0 card-no-border">
                     <h4>Penilaian Magang</h4>
                     <!-- <span>DataTablesdded to the table, as shown in this example.</span> -->
-                    
+                    <a class="btn btn-info" target="_blank" href="<?php echo base_url() ?>Penilaian_magang/cetak "> <i class="fas fa-print"></i> Cetak</a>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

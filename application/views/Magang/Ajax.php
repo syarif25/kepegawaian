@@ -23,23 +23,100 @@
     <script src="<?php echo base_url() ?>assets/js/script.js"></script>
     <script src="<?php echo base_url() ?>assets/js/theme-customizer/customizer.js"></script>
     <!-- Plugin used-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <!-- Script untuk menampilkan notifikasi jika ada -->
-    <?php if ($this->session->flashdata('message')): ?>
-        <script>
-            $(document).ready(function() {
-                $.toast({
-                    text: '<?php echo $this->session->flashdata('message'); ?>',
-                    position: 'top-right',
-                    loaderBg: '#ff6849',
-                    icon: 'success',
-                    hideAfter: 3000, // Durasi notifikasi ditampilkan (ms)
-                    stack: 6 // Maksimum notifikasi yang ditumpuk
-                });
-            });
-        </script>
-    <?php endif; ?>
-
     <script>
+    $(document).ready(function() {
+            // Check for success or error flash messages
+            var successMessage = "<?php echo $this->session->flashdata('success'); ?>";
+            var errorMessage = "<?php echo $this->session->flashdata('error'); ?>";
+
+            if (successMessage) {
+                // Display a success toast notification
+                Toastify({
+                    text: successMessage,
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#33cc33",
+                }).showToast();
+            } else if (errorMessage) {
+                // Display an error toast notification
+                Toastify({
+                    text: errorMessage,
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#ff0000", // You can change the background color for errors
+                }).showToast();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('Magangform');
+    const inputs = form.querySelectorAll('input');
+    const simpanButton = document.getElementById('btnSave');
+    const modal = document.getElementById('myModal');
+
+    // Function to check the validity of all inputs
+    function checkInputsValidity() {
+        let allValid = true;
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                allValid = false;
+            }
+        });
+        return allValid;
+    }
+
+    // Function to enable or disable the Simpan button
+    function updateSimpanButtonState() {
+        simpanButton.disabled = !checkInputsValidity();
+    }
+
+    // Check the validity of inputs when they lose focus
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (!input.checkValidity()) {
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+
+            updateSimpanButtonState();
+        });
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', function(event) {
+        if (!checkInputsValidity()) {
+            event.preventDefault();
+            inputs.forEach(input => {
+                if (!input.checkValidity()) {
+                    input.classList.add('is-invalid');
+                }
+            });
+        }
+    });
+
+    // Initialize the state of the Simpan button when the modal is shown
+    modal.addEventListener('show.bs.modal', function () {
+        updateSimpanButtonState();
+    });
+
+    // Reset the form and input states when the modal is closed
+    modal.addEventListener('hidden.bs.modal', function () {
+        form.reset();
+        inputs.forEach(input => {
+            input.classList.remove('is-invalid');
+        });
+        updateSimpanButtonState();
+    });
+});
+
    
     var save_method; //for save method string
     var table;
@@ -68,7 +145,7 @@
     });
 
     function tambah_magang() {
-         $('#form')[0].reset(); // reset form on modals
+         $('#Magangform')[0].reset(); // reset form on modals
          save_method = 'add';
         $('#modal_magang').modal('show');    
     }
@@ -86,7 +163,7 @@
             var pesan = ' Edit data';
         }
 
-        var formData = new FormData($('#form')[0]);
+        var formData = new FormData($('#Magangform')[0]);
         $.ajax({
             url : url,
             type: "POST",
@@ -100,7 +177,14 @@
                 {
                     $('#modal_magang').modal('hide');
                     reload_table();
-                    // notif(pesan);
+                    Toastify({
+                        text: "Berhasil " + pesan,
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#33cc33",
+                    }).showToast();
                 }
                 else
                 {
@@ -126,7 +210,7 @@
     function edit_magang(id)
     {
         save_method = 'update';
-        $('#form')[0].reset(); // reset form on modals
+        $('#Magangform')[0].reset(); // reset form on modals
 
 
         //Ajax Load data from ajax
@@ -168,9 +252,9 @@
                         <h4>Data Lembaga</h4>
                     </div>
                   <div class="card-body custom-input">
-                    <form action="#" id="form" class="row g-3">
+                    <form action="#" id="Magangform" class="row g-3">
                       <div class="col-6"> 
-                        <label class="form-label fw-bold" for="nama_lembaga">Nama Lembaga</label>
+                        <label class="form-label fw-bold" for="nama_lembaga">Nama Lengkap</label>
                         <input type="hidden" name="id_magang">
                         <select name="nik" id="" class="form-control">
                             <option value=""></option>
@@ -180,30 +264,37 @@
                             <option value="<?php echo $umana->nik; ?>"><?php echo $umana->nama_pelamar; ?></option>
                         <?php } ?>
                         </select>  
+                        <div id="error_nama" class="invalid-feedback">Nama harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="no_sk_magang">No SK Magang</label>
                         <input class="form-control" id="no_sk_magang" name="no_sk_magang" type="text" required="">
+                        <div id="error_no_sk" class="invalid-feedback">No SK harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="penempatan_magang">Penempatan Magang</label>
                         <input class="form-control" id="penempatan_magang" name="penempatan_magang" type="text"  required="">
+                        <div id="error_penempatan" class="invalid-feedback">Penempatan harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="tgl_mulai">Tanggal Mulai</label>
                         <input class="form-control" id="tgl_mulai" name="tgl_mulai" type="date"  required="">
+                        <div id="error_tanggal" class="invalid-feedback">Tanggal harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="no_surat_yayasan">No Surat Yayasan</label>
                         <input class="form-control" id="no_surat_yayasan" name="no_surat_yayasan" type="text"required="">
+                        <div id="error_surat" class="invalid-feedback">No Surat harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="tgl_pengesahan">Tanggal Pengesahan</label>
                         <input class="form-control" id="tgl_pengesahan" name="tgl_pengesahan" type="date" required=""> 
+                        <div id="error_tanggal" class="invalid-feedback">Tanggal harus diisi.</div>  
                       </div>
                       <div class="col-6"> 
                         <label class="form-label fw-bold" for="yang_mengesahkan">yang Mengesahkan</label>
                         <input class="form-control" id="yang_mengesahkan" name="yang_mengesahkan" type="text" required=""> 
+                        <div id="error_yang_menge" class="invalid-feedback"> harus diisi.</div>  
                       </div>
                       <div class="col-12">
                         <button class="btn btn-primary" type="button" id="btnSave" onclick="save()">Simpan</button>

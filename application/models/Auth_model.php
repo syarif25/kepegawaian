@@ -12,4 +12,15 @@ class Auth_model extends CI_Model {
         $query = $this->db->get_where('pengguna', array('username' => $username));
         return $query->row_array();
     }
+
+    public function getsqurity()
+	{
+		$login = $this->session->userdata('username');
+		if (empty($login)) 
+		{
+			$this->session->sess_destroy(); 
+			redirect('Auth');
+		}
+
+	}
 }

@@ -66,4 +66,11 @@ class Pelamar_model extends CI_Model {
 
 		return $query->row();
 	}
+
+	public function delete($item_id) {
+        $this->db->where('id_pelamar', $item_id);
+        $this->db->delete('pelamar');
+
+        return $this->db->affected_rows() > 0;
+    }
 }
